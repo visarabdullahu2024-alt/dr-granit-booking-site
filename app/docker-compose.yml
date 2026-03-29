@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  doctor-booking:
+    build: .
+    container_name: dr-granit-booking-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - skillbridge_data:/data
+    restart: unless-stopped
+
+volumes:
+  skillbridge_data:

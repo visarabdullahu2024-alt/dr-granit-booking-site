@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: dr-granit-booking-app
+    runtime: docker
+    rootDir: app
+    dockerfilePath: ./Dockerfile
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: DOCTOR_APP_HOST
+        value: 0.0.0.0
+      - key: DOCTOR_APP_DB_PATH
+        value: /tmp/doctor_booking.db
+      - key: DOCTOR_APP_CORS_ORIGIN
+        value: "*"
+      - key: DOCTOR_PUBLIC_EMAIL
+        value: dr.granit@hotmail.com
+      - key: DOCTOR_NOTIFICATION_EMAIL
+        value: visar.abdullahu@gmail.com
+      - key: DOCTOR_DASHBOARD_PASSWORD
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM_EMAIL
+        sync: false

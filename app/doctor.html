@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Dashboard | Dr. Granit Abdullahu</title>
+    <link rel="stylesheet" href="./styles.css?v=4" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="./doctor.html">Doctor Dashboard</a>
+        <nav class="nav">
+          <a href="./">Public Website</a>
+        </nav>
+      </header>
+
+      <main class="doctor-page">
+        <section class="section dashboard-section" id="dashboard">
+          <div class="section-heading compact">
+            <p class="eyebrow">Private Area</p>
+            <h2>Review bookings, lock time, and track notifications.</h2>
+          </div>
+
+          <div class="dashboard-login" id="dashboardLogin">
+            <form id="loginForm" class="login-card">
+              <label>
+                Doctor email
+                <input type="email" name="email" value="doctor@granitabdullahu.local" required />
+              </label>
+              <label>
+                Password
+                <input type="password" name="password" value="Doctor123!" required />
+              </label>
+              <button class="button button-primary" type="submit">Enter Dashboard</button>
+              <p class="form-status" id="loginStatus" aria-live="polite"></p>
+            </form>
+          </div>
+
+          <div class="dashboard-shell hidden" id="dashboardShell">
+            <div class="dashboard-actions">
+              <p class="dashboard-welcome" id="dashboardWelcome"></p>
+              <button class="button button-secondary" type="button" id="logoutButton">Log Out</button>
+            </div>
+
+            <div class="dashboard-grid">
+              <section class="dashboard-card">
+                <h3>New Notifications</h3>
+                <div class="notification-list" id="notificationList"></div>
+              </section>
+
+              <section class="dashboard-card">
+                <h3>Lock Day or Hours</h3>
+                <form id="lockForm" class="stack-form">
+                  <label>
+                    Location
+                    <select name="locationId" id="lockLocationSelect">
+                      <option value="">All locations</option>
+                    </select>
+                  </label>
+                  <label>
+                    Start
+                    <input type="datetime-local" name="startAt" required />
+                  </label>
+                  <label>
+                    End
+                    <input type="datetime-local" name="endAt" required />
+                  </label>
+                  <label>
+                    Note
+                    <input type="text" name="note" placeholder="Conference, surgery, travel..." />
+                  </label>
+                  <button class="button button-primary" type="submit">Add Lock</button>
+                  <p class="form-status" id="lockStatus" aria-live="polite"></p>
+                </form>
+                <div class="lock-list" id="lockList"></div>
+              </section>
+            </div>
+
+            <section class="dashboard-card booking-table-card">
+              <h3>Appointments</h3>
+              <div class="booking-list" id="bookingList"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js?v=4"></script>
+  </body>
+</html>

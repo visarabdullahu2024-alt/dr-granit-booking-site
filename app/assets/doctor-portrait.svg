@@ -1,0 +1,21 @@
+<svg width="900" height="1040" viewBox="0 0 900 1040" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="1040" rx="48" fill="url(#bg)"/>
+  <circle cx="677" cy="189" r="118" fill="#F4C38C" fill-opacity="0.38"/>
+  <circle cx="182" cy="832" r="172" fill="#0F766E" fill-opacity="0.18"/>
+  <path d="M451 245C560.352 245 649 333.648 649 443V494C649 603.352 560.352 692 451 692C341.648 692 253 603.352 253 494V443C253 333.648 341.648 245 451 245Z" fill="#F8D9BC"/>
+  <path d="M271 454C271 338.058 365.058 244 481 244H490C606.942 244 701 338.058 701 454V501H271V454Z" fill="#1F2A2D"/>
+  <path d="M311 756C311 695.249 360.249 646 421 646H484C544.751 646 594 695.249 594 756V1040H311V756Z" fill="#F9FCFD"/>
+  <path d="M374 646H531L570 1040H335L374 646Z" fill="#FFFFFF"/>
+  <path d="M430 689H476L495 1040H411L430 689Z" fill="#0F766E" fill-opacity="0.12"/>
+  <path d="M352 441C352 386.324 396.324 342 451 342C505.676 342 550 386.324 550 441V492C550 546.676 505.676 591 451 591C396.324 591 352 546.676 352 492V441Z" fill="#F2CAA8"/>
+  <path d="M351 430C351 377.533 393.533 335 446 335H456C508.467 335 551 377.533 551 430V448C551 459.046 542.046 468 531 468H371C359.954 468 351 459.046 351 448V430Z" fill="#253437"/>
+  <path d="M300 1040C308.067 883.305 373.352 805 495.854 805C618.356 805 685.114 883.305 696 1040H300Z" fill="#E4F1EE"/>
+  <rect x="208" y="97" width="222" height="64" rx="32" fill="white" fill-opacity="0.58"/>
+  <text x="240" y="139" fill="#0F766E" font-family="Avenir Next, Arial, sans-serif" font-size="28" font-weight="700">Dr. G. Abdullahu</text>
+  <defs>
+    <linearGradient id="bg" x1="450" y1="0" x2="450" y2="1040" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DDEFEA"/>
+      <stop offset="1" stop-color="#F8E4D0"/>
+    </linearGradient>
+  </defs>
+</svg>

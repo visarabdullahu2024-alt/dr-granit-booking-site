@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dr. Granit Abdullahu | Thoracic Surgeon</title>
+    <link rel="stylesheet" href="./styles.css?v=7" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container topbar-simple">
+        <a class="brand-simple" href="#home">
+          <span class="brand-mark">+</span>
+          <span>
+            <strong>Dr. Granit Abdullahu</strong>
+            <small data-i18n="brand_subtitle">Thoracic Surgery</small>
+          </span>
+        </a>
+        <nav class="nav-simple">
+          <a href="#services" data-i18n="nav_services">Services</a>
+          <a href="#book" data-i18n="nav_book">Book Appointment</a>
+        </nav>
+        <div class="language-switch" role="group" aria-label="Language switcher">
+          <button class="lang-button is-active" type="button" data-lang="en">EN</button>
+          <button class="lang-button" type="button" data-lang="sq">SQ</button>
+        </div>
+        <div class="header-contact">
+          <span data-i18n="call_us">Call Us</span>
+          <strong>044960003</strong>
+        </div>
+      </div>
+    </header>
+
+    <main id="home">
+      <section class="hero-simple">
+        <div class="container hero-simple-grid">
+          <div class="hero-simple-copy">
+            <p class="eyebrow" data-i18n="hero_eyebrow">Book Appointment With Doctor</p>
+            <h1>Granit Abdullahu</h1>
+            <h2 class="hero-subtitle">THORACIC SURGERY</h2>
+            <p class="lede" id="doctorBio"></p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#book" data-i18n="hero_cta">Make Appointment</a>
+            </div>
+            <ul class="hero-meta" id="doctorHighlights"></ul>
+          </div>
+
+          <div class="hero-simple-photo">
+            <div class="portrait-frame portrait-large">
+              <img src="./assets/doctor-photo.jpg" alt="Dr. Granit Abdullahu portrait" />
+            </div>
+            <div class="contact-strip">
+              <div class="contact-card">
+                <strong data-i18n="email_label">Email</strong>
+                <span>dr.granit@hotmail.com</span>
+              </div>
+              <div class="contact-card">
+                <strong data-i18n="phone_label">Phone</strong>
+                <span>044960003</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="quick-info">
+        <div class="container quick-info-grid">
+          <article class="quick-card">
+            <h3 data-i18n="quick_1_title">Thoracic Surgery</h3>
+            <p data-i18n="quick_1_text">Specialist consultations and follow-up care</p>
+          </article>
+          <article class="quick-card">
+            <h3 data-i18n="quick_2_title">Working Time</h3>
+            <p data-i18n="quick_2_text">Choose from available appointment slots</p>
+          </article>
+          <article class="quick-card">
+            <h3 data-i18n="quick_3_title">Request Form</h3>
+            <p data-i18n="quick_3_text">Send your booking directly online</p>
+          </article>
+          <article class="quick-card">
+            <h3 data-i18n="quick_4_title">Doctor Email</h3>
+            <p>dr.granit@hotmail.com</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section section-light" id="services">
+        <div class="container">
+          <div class="section-heading center">
+            <p class="eyebrow" data-i18n="services_eyebrow">Services</p>
+            <h2 data-i18n="services_heading">Simple specialist care for consultations and follow-up visits.</h2>
+          </div>
+          <div class="service-grid" id="serviceGrid"></div>
+        </div>
+      </section>
+
+      <section class="section section-light" id="book">
+        <div class="container booking-simple-grid">
+          <div class="booking-intro">
+            <p class="eyebrow" data-i18n="form_eyebrow">Appointment Form</p>
+            <h2 data-i18n="form_heading">Book appointment with Dr. Granit Abdullahu.</h2>
+            <p class="lede-small" data-i18n="form_intro">
+              Fill in your name, reason for appointment, and available time slot.
+            </p>
+            <div class="booking-note">
+              <p><strong data-i18n="phone_label">Phone</strong>: 044960003</p>
+              <p><strong data-i18n="email_label">Email</strong>: dr.granit@hotmail.com</p>
+            </div>
+          </div>
+
+          <div class="booking-panel booking-panel-simple">
+            <form id="bookingForm" class="booking-form">
+              <label>
+                <span data-i18n="field_name">Full name</span>
+                <input type="text" name="patientName" data-i18n-placeholder="placeholder_name" placeholder="Patient full name" required />
+              </label>
+              <label>
+                <span data-i18n="email_label">Email</span>
+                <input type="email" name="patientEmail" placeholder="patient@email.com" required />
+              </label>
+              <label>
+                <span data-i18n="field_phone">Phone number</span>
+                <input type="tel" name="patientPhone" data-i18n-placeholder="placeholder_phone" placeholder="044..." />
+              </label>
+              <label>
+                <span data-i18n="field_service">Service</span>
+                <select name="serviceId" id="serviceSelect" required></select>
+              </label>
+              <input type="hidden" name="locationId" id="locationSelect" />
+              <label>
+                <span data-i18n="field_reason">Reason for appointment</span>
+                <textarea
+                  name="reason"
+                  rows="5"
+                  data-i18n-placeholder="placeholder_reason"
+                  placeholder="Write shortly why you need the appointment"
+                  required
+                ></textarea>
+              </label>
+              <label>
+                <span data-i18n="field_slot">Available time slot</span>
+                <select name="slot" id="slotSelect" required>
+                  <option value="" data-i18n="slot_choose_service">Choose service first</option>
+                </select>
+              </label>
+              <button class="button button-primary full-width" type="submit" data-i18n="submit_booking">Send Booking Request</button>
+            </form>
+
+            <p class="form-status" id="bookingStatus" aria-live="polite"></p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="container footer-simple">
+          <div>
+            <strong>Dr. Granit Abdullahu</strong>
+            <p data-i18n="brand_subtitle">Thoracic Surgery</p>
+          </div>
+          <div>
+            <p><span data-i18n="phone_label">Phone</span>: 044960003</p>
+            <p><span data-i18n="email_label">Email</span>: dr.granit@hotmail.com</p>
+          </div>
+          <div>
+            <a href="./doctor.html" data-i18n="doctor_login">Doctor Login</a>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="./app.js?v=7"></script>
+  </body>
+</html>
