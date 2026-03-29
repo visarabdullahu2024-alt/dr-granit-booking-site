@@ -25,6 +25,7 @@ body {
   color: var(--text);
   font-family: "Segoe UI", Arial, sans-serif;
   background: var(--bg);
+  -webkit-text-size-adjust: 100%;
 }
 
 a {
@@ -59,7 +60,9 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 18px;
+  padding: 16px 0;
 }
 
 .brand-simple {
@@ -447,11 +450,19 @@ input,
 select,
 textarea {
   width: 100%;
-  padding: 14px 16px;
+  padding: 15px 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--surface-alt);
   color: var(--text);
+  font-size: 16px;
+}
+
+select,
+button,
+input,
+textarea {
+  min-height: 52px;
 }
 
 textarea {
@@ -652,9 +663,17 @@ textarea {
   .hero-simple-grid {
     min-height: auto;
   }
+
+  .hero-simple-grid {
+    gap: 24px;
+  }
 }
 
 @media (max-width: 760px) {
+  .container {
+    width: min(100% - 24px, 1160px);
+  }
+
   .topbar-simple,
   .footer-simple,
   .dashboard-actions,
@@ -681,13 +700,99 @@ textarea {
     text-align: left;
   }
 
+  .topbar-simple {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .brand-simple {
+    width: 100%;
+  }
+
+  .language-switch {
+    order: 3;
+  }
+
+  .header-contact {
+    order: 4;
+    width: 100%;
+  }
+
+  .header-contact strong {
+    font-size: 1.05rem;
+  }
+
+  .hero-simple {
+    padding-top: 6px;
+  }
+
+  .hero-simple-copy {
+    order: 2;
+  }
+
+  .hero-simple-photo {
+    order: 1;
+  }
+
+  .portrait-large {
+    aspect-ratio: 1;
+  }
+
+  .hero-simple-copy h1 {
+    font-size: clamp(2.3rem, 12vw, 3.4rem);
+  }
+
+  .hero-subtitle {
+    font-size: 1.15rem;
+  }
+
+  .lede,
+  .lede-small,
+  .hero-meta {
+    font-size: 0.98rem;
+  }
+
+  .button {
+    width: 100%;
+  }
+
   .quick-info {
     margin-top: 0;
     padding-top: 24px;
   }
 
+  .quick-card {
+    padding: 18px;
+  }
+
   .section {
-    padding: 54px 0;
+    padding: 44px 0;
+  }
+
+  .booking-panel,
+  .contact-card,
+  .service-card,
+  .dashboard-card,
+  .login-card {
+    border-radius: 18px;
+  }
+
+  .booking-panel {
+    padding: 20px;
+  }
+
+  .booking-simple-grid {
+    gap: 20px;
+  }
+
+  .booking-form,
+  .stack-form,
+  .login-card {
+    gap: 14px;
+  }
+
+  .contact-card span {
+    white-space: normal;
   }
 }
 

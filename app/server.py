@@ -71,6 +71,12 @@ SEED_SERVICES = [
         "duration_minutes": 30,
         "price_label": "By request",
     },
+    {
+        "name": "Surgery Booking",
+        "description": "Pre-surgery planning, booking request, and coordination for thoracic surgical procedures.",
+        "duration_minutes": 60,
+        "price_label": "By request",
+    },
 ]
 
 SEED_LOCATIONS = [
