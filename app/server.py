@@ -15,14 +15,23 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+try:
+    import psycopg
+    from psycopg.rows import dict_row
+except ImportError:
+    psycopg = None
+    dict_row = None
+
 ROOT = Path(__file__).resolve().parent
 DB_PATH = Path(os.getenv("DOCTOR_APP_DB_PATH", str(ROOT / "doctor_booking.db")))
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 HOST = os.getenv("DOCTOR_APP_HOST", "127.0.0.1")
 PORT = int(os.getenv("PORT") or os.getenv("DOCTOR_APP_PORT", "8000"))
 CORS_ORIGIN = os.getenv("DOCTOR_APP_CORS_ORIGIN", "*")
 SESSION_COOKIE = "doctor_booking_session"
 EMAIL_RE = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
 SESSIONS = {}
+USE_POSTGRES = bool(DATABASE_URL)
 
 APP_CONFIG = {
     "doctorName": "Dr. Granit Abdullahu",
@@ -163,89 +172,190 @@ def format_day_label(day_index: int) -> str:
     return labels[day_index]
 
 
+class DBConnection:
+    def __init__(self, raw_conn, use_postgres: bool):
+        self.raw_conn = raw_conn
+        self.use_postgres = use_postgres
+
+    def execute(self, sql: str, params=()):
+        if self.use_postgres:
+            return self.raw_conn.execute(sql.replace("?", "%s"), params)
+        return self.raw_conn.execute(sql, params)
+
+    def executescript(self, script: str):
+        if self.use_postgres:
+            statements = [part.strip() for part in script.split(";") if part.strip()]
+            for statement in statements:
+                self.raw_conn.execute(statement)
+            return None
+        return self.raw_conn.executescript(script)
+
+    def commit(self):
+        return self.raw_conn.commit()
+
+    def close(self):
+        return self.raw_conn.close()
+
+
 def db_conn():
+    if USE_POSTGRES:
+        if psycopg is None:
+            raise RuntimeError("DATABASE_URL is set but psycopg is not installed.")
+        conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
+        return DBConnection(conn, True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
-    return conn
+    return DBConnection(conn, False)
 
 
 def init_db():
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = db_conn()
-    conn.executescript(
-        """
-        CREATE TABLE IF NOT EXISTS doctor_accounts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL UNIQUE,
-            password_salt TEXT NOT NULL,
-            password_hash TEXT NOT NULL,
-            created_at TEXT NOT NULL
-        );
+    if not USE_POSTGRES:
+        DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+        conn.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS doctor_accounts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                password_salt TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
 
-        CREATE TABLE IF NOT EXISTS services (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            description TEXT NOT NULL,
-            duration_minutes INTEGER NOT NULL,
-            price_label TEXT NOT NULL
-        );
+            CREATE TABLE IF NOT EXISTS services (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                description TEXT NOT NULL,
+                duration_minutes INTEGER NOT NULL,
+                price_label TEXT NOT NULL
+            );
 
-        CREATE TABLE IF NOT EXISTS locations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL UNIQUE,
-            address TEXT NOT NULL,
-            details TEXT NOT NULL
-        );
+            CREATE TABLE IF NOT EXISTS locations (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL UNIQUE,
+                address TEXT NOT NULL,
+                details TEXT NOT NULL
+            );
 
-        CREATE TABLE IF NOT EXISTS weekly_availability (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            location_id INTEGER NOT NULL,
-            day_of_week INTEGER NOT NULL,
-            start_time TEXT NOT NULL,
-            end_time TEXT NOT NULL,
-            FOREIGN KEY(location_id) REFERENCES locations(id)
-        );
+            CREATE TABLE IF NOT EXISTS weekly_availability (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                location_id INTEGER NOT NULL,
+                day_of_week INTEGER NOT NULL,
+                start_time TEXT NOT NULL,
+                end_time TEXT NOT NULL,
+                FOREIGN KEY(location_id) REFERENCES locations(id)
+            );
 
-        CREATE TABLE IF NOT EXISTS schedule_locks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            location_id INTEGER,
-            start_at TEXT NOT NULL,
-            end_at TEXT NOT NULL,
-            note TEXT,
-            created_at TEXT NOT NULL,
-            FOREIGN KEY(location_id) REFERENCES locations(id)
-        );
+            CREATE TABLE IF NOT EXISTS schedule_locks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                location_id INTEGER,
+                start_at TEXT NOT NULL,
+                end_at TEXT NOT NULL,
+                note TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(location_id) REFERENCES locations(id)
+            );
 
-        CREATE TABLE IF NOT EXISTS bookings (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            patient_name TEXT NOT NULL,
-            patient_email TEXT NOT NULL,
-            patient_phone TEXT,
-            reason TEXT NOT NULL,
-            service_id INTEGER NOT NULL,
-            location_id INTEGER NOT NULL,
-            appointment_at TEXT NOT NULL,
-            appointment_end_at TEXT NOT NULL,
-            status TEXT NOT NULL,
-            source TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            FOREIGN KEY(service_id) REFERENCES services(id),
-            FOREIGN KEY(location_id) REFERENCES locations(id)
-        );
+            CREATE TABLE IF NOT EXISTS bookings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                patient_name TEXT NOT NULL,
+                patient_email TEXT NOT NULL,
+                patient_phone TEXT,
+                reason TEXT NOT NULL,
+                service_id INTEGER NOT NULL,
+                location_id INTEGER NOT NULL,
+                appointment_at TEXT NOT NULL,
+                appointment_end_at TEXT NOT NULL,
+                status TEXT NOT NULL,
+                source TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(service_id) REFERENCES services(id),
+                FOREIGN KEY(location_id) REFERENCES locations(id)
+            );
 
-        CREATE TABLE IF NOT EXISTS notifications (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            booking_id INTEGER,
-            kind TEXT NOT NULL,
-            title TEXT NOT NULL,
-            message TEXT NOT NULL,
-            is_read INTEGER NOT NULL DEFAULT 0,
-            created_at TEXT NOT NULL,
-            FOREIGN KEY(booking_id) REFERENCES bookings(id)
-        );
-        """
-    )
+            CREATE TABLE IF NOT EXISTS notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                booking_id INTEGER,
+                kind TEXT NOT NULL,
+                title TEXT NOT NULL,
+                message TEXT NOT NULL,
+                is_read INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(booking_id) REFERENCES bookings(id)
+            );
+            """
+        )
+    else:
+        conn.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS doctor_accounts (
+                id BIGSERIAL PRIMARY KEY,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                password_salt TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS services (
+                id BIGSERIAL PRIMARY KEY,
+                name TEXT NOT NULL UNIQUE,
+                description TEXT NOT NULL,
+                duration_minutes INTEGER NOT NULL,
+                price_label TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS locations (
+                id BIGSERIAL PRIMARY KEY,
+                name TEXT NOT NULL UNIQUE,
+                address TEXT NOT NULL,
+                details TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS weekly_availability (
+                id BIGSERIAL PRIMARY KEY,
+                location_id BIGINT NOT NULL REFERENCES locations(id),
+                day_of_week INTEGER NOT NULL,
+                start_time TEXT NOT NULL,
+                end_time TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS schedule_locks (
+                id BIGSERIAL PRIMARY KEY,
+                location_id BIGINT REFERENCES locations(id),
+                start_at TEXT NOT NULL,
+                end_at TEXT NOT NULL,
+                note TEXT,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS bookings (
+                id BIGSERIAL PRIMARY KEY,
+                patient_name TEXT NOT NULL,
+                patient_email TEXT NOT NULL,
+                patient_phone TEXT,
+                reason TEXT NOT NULL,
+                service_id BIGINT NOT NULL REFERENCES services(id),
+                location_id BIGINT NOT NULL REFERENCES locations(id),
+                appointment_at TEXT NOT NULL,
+                appointment_end_at TEXT NOT NULL,
+                status TEXT NOT NULL,
+                source TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS notifications (
+                id BIGSERIAL PRIMARY KEY,
+                booking_id BIGINT REFERENCES bookings(id),
+                kind TEXT NOT NULL,
+                title TEXT NOT NULL,
+                message TEXT NOT NULL,
+                is_read INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL
+            );
+            """
+        )
 
     seeded_email = "doctor@granitabdullahu.local"
     existing = conn.execute("SELECT id FROM doctor_accounts WHERE email = ?", (seeded_email,)).fetchone()
@@ -779,7 +889,20 @@ class AppHandler(SimpleHTTPRequestHandler):
                     now,
                 ),
             )
-            booking_id = conn.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
+            if USE_POSTGRES:
+                booking_id = conn.execute(
+                    """
+                    SELECT id
+                    FROM bookings
+                    WHERE patient_email = ?
+                      AND appointment_at = ?
+                    ORDER BY id DESC
+                    LIMIT 1
+                    """,
+                    (patient_email, appointment_at.isoformat()),
+                ).fetchone()["id"]
+            else:
+                booking_id = conn.execute("SELECT last_insert_rowid() AS id").fetchone()["id"]
             row = conn.execute(
                 """
                 SELECT b.*, s.name AS service_name, l.name AS location_name

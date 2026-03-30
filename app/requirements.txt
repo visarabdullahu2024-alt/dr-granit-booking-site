@@ -1,1 +1,1 @@
-# Standard-library only server (no third-party dependencies)
+psycopg[binary]==3.2.9
